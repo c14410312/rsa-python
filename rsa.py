@@ -41,8 +41,8 @@ def is_prime(n):
             return False #n is composite
     return True # n is prime
 
-def main():
-    
+#generate public and private keys
+def gen_keys():
     #loop until both p and q are prime
     while True:
         
@@ -56,22 +56,82 @@ def main():
             break
     #get the mod
     n = p * q
-    print("mod = " + str(n))
 
     #get phi(n)
     t = (p -1) * (q-1)
-    print("phi(n) = " + str(t))
+    
     #find e such that e and t are coprime gcd(e,t) == 1
     for i in range(2, t):
         if gcd(i, t) == 1:
             e = i
             break
-    print("e = " + str(e))
+    
     for i in range(2, t):
 
-        if i * 7 % t == 1:
+        if i * e % t == 1:
             d = i
             break
-    print("d=" + str(d))
+    return  e, n, d
+
+
+#encrypts text
+def encrypt(e, n):
+    pt = list(input("\nenter plain text to encrypt: "))
+    pt = [ ord(x) for x in pt]
+    print("\n##########################")
+    print("Pre encryption")
+    print(pt)
+
+    ct = []
+    #encrypt each element
+    for el in pt:
+        ct.append( (pow(el, e) % n))
+    print("Post encryption")
+    print(ct)
+    print("##########################")
+    return ct
+
+def decrypt(ct, d, n):
+    #decrypt each element
+    pt = []
+    for el in ct:
+        pt.append(chr((pow(el, d) % n)))
+    #print("the decrypted message is: " + str(ct))
+    print("\n##########################")
+    print("The Decrypted message is:")
+    print(''.join(pt))
+    print("##########################")
+
+def main():
+
+    #generate public and private keys 
+    e, n, d = gen_keys()
+    
+    choice = -1
+
+    while choice is not "0":
+
+        print('\n-------------------')
+        print("RSA Program")
+        print("encrypt: press 1")
+        print("decrypt: press 2")
+        print("exit: press 0")
+        print('-------------------\n')
+
+        choice = input("Choose option: ")
+
+
+        #encrypt message
+        if choice == "1":
+            ct = encrypt(e, n)
+            print(len(ct))
+
+        #decrypt the message pt
+        if(choice == "2"):
+            try:
+                decrypt(ct, d, n)
+            except (UnboundLocalError,TypeError):
+                print("no encrypted text found, select option 1 to encrypt")
+
 if __name__ == "__main__":
     main()
